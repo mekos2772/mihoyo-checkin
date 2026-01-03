@@ -765,15 +765,26 @@ class MihoyoCheckinApp:
         
         # 解析时间
         hour, minute = map(int, config.schedule_time.split(":"))
+        
+        def on_time_change(e):
+            self._update_schedule_time(e)
+        
         time_picker = ft.TimePicker(
             value=datetime(2000, 1, 1, hour, minute).time(),
-            on_change=lambda e: self._update_schedule_time(e),
+            on_change=on_time_change,
         )
+        
+        # 将 TimePicker 添加到 overlay
+        self.page.overlay.append(time_picker)
+        
+        def open_time_picker(_):
+            time_picker.open = True
+            self.page.update()
         
         time_button = ft.ElevatedButton(
             f"签到时间: {config.schedule_time}",
             icon=ft.Icons.ACCESS_TIME,
-            on_click=lambda _: self.page.open(time_picker),
+            on_click=open_time_picker,
         )
         
         next_run_text = ft.Text(
